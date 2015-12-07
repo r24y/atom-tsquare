@@ -13,6 +13,11 @@
     "atom": ">=1.0.0 <2.0.0"
   },
   "dependencies": {
-    "space-pen": "^5.1.1"
+    "detector-webgl": "^2.0.0",
+    "jscad": "^1.1.0",
+    "space-pen": "^5.1.1",
+    "three": "^0.73.0",
+    "three-orbit-controls": "^72.0.0",
+    "three-pointer-controls": "^0.5.3"
   }
 }
