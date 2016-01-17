@@ -1,7 +1,11 @@
 {View} = require 'space-pen'
 THREE = require 'three'
 OrbitControls = (require 'three-orbit-controls')(THREE)
+vm = require 'vm'
 hasGL = require 'detector-webgl'
+Sandbox = require 'sandbox'
+jscad = require 'jscad'
+console.log 'JSCad', jscad
 
 module.exports =
 class AtomTsquareView extends View
@@ -13,7 +17,21 @@ class AtomTsquareView extends View
 
   initialize: ({@uri, @cadSource}) ->
     @cadSource ?= ''
+    @run @cadSource
     @threeInit()
+
+  run: (code) ->
+    script = new vm.Script code, filename: @uri
+    script.runInNewContext()
+    return
+    sandbox = new Sandbox
+    sandbox.options.timeout = 10e3
+    code = """(function() { require('jscad'); return (function () {#{code}
+    return main();
+    })(); })()"""
+    console.log code
+    sandbox.run code, (output) ->
+      console.log "Sandbox result", output.result
 
   threeInit: ->
     @camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000)
@@ -64,7 +82,8 @@ class AtomTsquareView extends View
   @content: ->
     @div =>
         @div class: "viewer", outlet: "threeContainer", resize: "onViewResize"
-        @pre style: "position: absolute; top: 0; left: 0; background: transparent; color: black; pointer-events: none;", outlet: "debug"
+        @code =>
+          @pre style: "position: absolute; top: 0; left: 0; background: transparent; color: black; pointer-events: none;", outlet: "debug"
 
   getURI: -> @uri
   getTitle: -> "3D - #{@uri}"
